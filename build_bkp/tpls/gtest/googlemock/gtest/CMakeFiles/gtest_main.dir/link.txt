@@ -1,1 +1,0 @@
-/usr/bin/g++ -fPIC  -DPATH_MAX=4096 -Wno-attributes -DNO_GPU -DEXATN_SERVICE -Wno-error=deprecated-copy -O3 -DNDEBUG -shared -Wl,-soname,libgtest_main.so -o ../../../../lib/libgtest_main.so CMakeFiles/gtest_main.dir/src/gtest_main.cc.o  -Wl,-rpath,/home/schundu3/projects/ornl_tools/ORNL_QIS_Stack/exatn/build/lib: ../../../../lib/libgtest.so -lpthread 

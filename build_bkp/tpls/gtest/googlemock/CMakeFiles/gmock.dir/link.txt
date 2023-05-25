@@ -1,1 +1,0 @@
-/usr/bin/g++ -fPIC  -DPATH_MAX=4096 -Wno-attributes -DNO_GPU -DEXATN_SERVICE -Wno-error=deprecated-copy -O3 -DNDEBUG -shared -Wl,-soname,libgmock.so -o ../../../lib/libgmock.so "CMakeFiles/gmock.dir/src/gmock-all.cc.o"  -Wl,-rpath,/home/schundu3/projects/ornl_tools/ORNL_QIS_Stack/exatn/build/lib: ../../../lib/libgtest.so -lpthread 
