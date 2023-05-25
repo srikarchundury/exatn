@@ -15,6 +15,7 @@ Copyright (C) 2018-2021 Oak Ridge National Laboratory (UT-Battelle) **/
 #include "network_builder.hpp"
 #include "network_builder_mps.hpp"
 #include "network_builder_ttn.hpp"
+#include "network_builder_peps.hpp"
 
 #include <string>
 #include <memory>

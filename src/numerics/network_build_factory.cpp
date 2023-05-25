@@ -14,6 +14,7 @@ NetworkBuildFactory::NetworkBuildFactory()
 {
  registerNetworkBuilder("MPS",&NetworkBuilderMPS::createNew);
  registerNetworkBuilder("TTN",&NetworkBuilderTTN::createNew);
+ registerNetworkBuilder("PEPS",&NetworkBuilderPEPS::createNew);
 }
 
 void NetworkBuildFactory::registerNetworkBuilder(const std::string & name, createNetworkBuilderFn creator)

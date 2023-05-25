@@ -1,0 +1,189 @@
+/** ExaTN::Numerics: Tensor network builder: PEPS: Projected Entangled Pair States
+ * 
+ * Srikar: Just copied from MPS and replaced all MPS with PEPS to avoid conflicts.
+REVISION: 2023/05/23
+
+Copyright (C) 2018-2021 Dmitry I. Lyakh (Liakh)
+Copyright (C) 2018-2021 Oak Ridge National Laboratory (UT-Battelle) **/
+
+#include "network_builder_peps.hpp"
+#include "tensor_network.hpp"
+
+#include <initializer_list>
+
+namespace exatn{
+
+namespace numerics{
+
+NetworkBuilderPEPS::NetworkBuilderPEPS():
+ max_bond_dim_(1), Lx_(2), Ly_(2)
+{
+}
+
+
+bool NetworkBuilderPEPS::getParameter(const std::string & name, long long * value) const
+{
+ bool found = true;
+ if(name == "max_bond_dim"){
+  *value = max_bond_dim_;
+ }else if(name == "Lx"){
+  *value = Lx_;
+ }else if(name == "Ly"){
+  *value = Ly_;
+ }else{
+  found = false;
+ }
+ return found;
+}
+
+
+bool NetworkBuilderPEPS::setParameter(const std::string & name, long long value)
+{
+ bool found = true;
+ if(name == "max_bond_dim"){
+  max_bond_dim_ = value;
+ }else if(name == "Lx"){
+  Lx_ = value;
+ }else if(name == "Ly"){
+  Ly_ = value;
+ }else{
+  found = false;
+ }
+ return found;
+}
+
+
+void NetworkBuilderPEPS::build(TensorNetwork & network, bool tensor_operator)
+{
+ std::cout << "SRIDEBUG: build for PEPS is called\n";
+ std::cout << "TODO: build PEPS, not MPS\n";
+ bool appended = true;
+ //Inspect the output tensor:
+ auto output_tensor = network.getTensor(0);
+ auto output_tensor_rank = output_tensor->getRank();
+ assert(output_tensor_rank > 0);
+ const auto & output_dim_extents = output_tensor->getDimExtents();
+ if(tensor_operator){
+  assert(output_tensor_rank % 2 == 0); //tensor operators are assumed to be of even rank here
+  output_tensor_rank /= 2;
+  for(unsigned int i = 0; i < output_tensor_rank; ++i){
+   assert(output_dim_extents[i] == output_dim_extents[output_tensor_rank+i]);
+  }
+ }
+ if(output_tensor_rank == 1){
+  appended = network.placeTensor(1, //tensor id
+                                 std::make_shared<Tensor>("_T"+std::to_string(1), //tensor name
+                                  std::initializer_list<DimExtent>{output_dim_extents[0]}),
+                                 {TensorLeg{0,0}},
+                                 false,
+                                 false
+                                );
+  assert(appended);
+  auto & tensor = *(network.getTensor(1));
+  tensor.rename(generateTensorName(tensor,"t"));
+ }else if(output_tensor_rank == 2){
+  DimExtent bond_dim = std::min(static_cast<DimExtent>(max_bond_dim_),
+                                std::min(output_dim_extents[0],output_dim_extents[1]));
+  appended = network.placeTensor(1, //tensor id
+                                 std::make_shared<Tensor>("_T"+std::to_string(1), //tensor name
+                                  std::initializer_list<DimExtent>{output_dim_extents[0],bond_dim}),
+                                 {TensorLeg{0,0},TensorLeg{2,0}},
+                                 false,
+                                 false
+                                );
+  assert(appended);
+  auto & tensor1 = *(network.getTensor(1));
+  tensor1.rename(generateTensorName(tensor1,"t"));
+  appended = network.placeTensor(2, //tensor id
+                                 std::make_shared<Tensor>("_T"+std::to_string(2), //tensor name
+                                  std::initializer_list<DimExtent>{bond_dim,output_dim_extents[1]}),
+                                 {TensorLeg{1,1},TensorLeg{0,1}},
+                                 false,
+                                 false
+                                );
+  assert(appended);
+  auto & tensor2 = *(network.getTensor(2));
+  tensor2.rename(generateTensorName(tensor2,"t"));
+ }else{ //output_tensor_rank > 2
+  //Compute internal bond dimensions:
+  DimExtent left_bonds[output_tensor_rank], right_bonds[output_tensor_rank];
+  DimExtent left_dim = 1;
+  for(int i = 0; i < output_tensor_rank; ++i){
+   left_bonds[i] = left_dim;
+   left_dim *= output_dim_extents[i];
+   if(left_dim > max_bond_dim_) left_dim = max_bond_dim_;
+  }
+  DimExtent right_dim = 1;
+  for(int i = (output_tensor_rank - 1); i >= 0; --i){
+   right_bonds[i] = right_dim;
+   right_dim *= output_dim_extents[i];
+   if(right_dim > max_bond_dim_) right_dim = max_bond_dim_;
+  }
+  //Append left boundary input tensor:
+  right_dim = std::min(left_bonds[1],right_bonds[0]);
+  appended = network.placeTensor(1, //tensor id
+                                 std::make_shared<Tensor>("_T"+std::to_string(1), //tensor name
+                                  std::initializer_list<DimExtent>{output_dim_extents[0],right_dim}),
+                                 {TensorLeg{0,0},TensorLeg{2,0}},
+                                 false,
+                                 false
+                                );
+  assert(appended);
+  auto & tensor1 = *(network.getTensor(1));
+  tensor1.rename(generateTensorName(tensor1,"t"));
+  //Append right boundary input tensor:
+  left_dim = std::min(right_bonds[output_tensor_rank-2],left_bonds[output_tensor_rank-1]);
+  appended = network.placeTensor(output_tensor_rank, //tensor id
+                                 std::make_shared<Tensor>("_T"+std::to_string(output_tensor_rank), //tensor name
+                                  std::initializer_list<DimExtent>{left_dim,output_dim_extents[output_tensor_rank-1]}),
+                                 {TensorLeg{output_tensor_rank-1,2},TensorLeg{0,output_tensor_rank-1}},
+                                 false,
+                                 false
+                                );
+  assert(appended);
+  auto & tensor2 = *(network.getTensor(output_tensor_rank));
+  tensor2.rename(generateTensorName(tensor2,"t"));
+  //Append the internal input tensors:
+  for(unsigned int i = 1; i < (output_tensor_rank - 1); ++i){
+   left_dim = std::min(left_bonds[i],right_bonds[i-1]);
+   right_dim = std::min(right_bonds[i],left_bonds[i+1]);
+   if(i == 1){
+    appended = network.placeTensor(1+i, //tensor id
+                                   std::make_shared<Tensor>("_T"+std::to_string(1+i), //tensor name
+                                    std::initializer_list<DimExtent>{left_dim,output_dim_extents[i],right_dim}),
+                                   {TensorLeg{i,1},TensorLeg{0,i},TensorLeg{i+2,0}},
+                                   false,
+                                   false
+                                  );
+   }else{
+    appended = network.placeTensor(1+i, //tensor id
+                                   std::make_shared<Tensor>("_T"+std::to_string(1+i), //tensor name
+                                    std::initializer_list<DimExtent>{left_dim,output_dim_extents[i],right_dim}),
+                                   {TensorLeg{i,2},TensorLeg{0,i},TensorLeg{i+2,0}},
+                                   false,
+                                   false
+                                  );
+   }
+   assert(appended);
+   auto & tensor = *(network.getTensor(1+i));
+   tensor.rename(generateTensorName(tensor,"t"));
+  }
+ }
+ if(tensor_operator){
+  for(unsigned int i = 0; i < output_tensor_rank; ++i){
+   auto * tens_conn = network.getTensorConn(1+i);
+   tens_conn->appendLeg(output_dim_extents[output_tensor_rank+i],TensorLeg{0,output_tensor_rank+i});
+  }
+ }
+ return;
+}
+
+
+std::unique_ptr<NetworkBuilder> NetworkBuilderPEPS::createNew()
+{
+ return std::unique_ptr<NetworkBuilder>(new NetworkBuilderPEPS());
+}
+
+} //namespace numerics
+
+} //namespace exatn

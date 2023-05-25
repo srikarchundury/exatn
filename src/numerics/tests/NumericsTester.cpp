@@ -136,8 +136,10 @@ TEST(NumericsTester, checkNetworkBuilders)
  auto & network_build_factory = *(numerics::NetworkBuildFactory::get());
  auto builder_mps = network_build_factory.createNetworkBuilderShared("MPS");
  auto builder_ttn = network_build_factory.createNetworkBuilderShared("TTN");
+ auto builder_peps = network_build_factory.createNetworkBuilderShared("PEPS");
  assert(builder_mps);
  assert(builder_ttn);
+ assert(builder_peps);
  //Building an MPS tensor network with 8 sites and max bond dimension of 6:
  //  O-O-O-O-O-O-O-O
  //  | | | | | | | |
@@ -158,6 +160,28 @@ TEST(NumericsTester, checkNetworkBuilders)
  auto output_tensor_ttn = makeSharedTensor("Z_TTN",std::vector<DimExtent>{2,2,2,2,2,2,2,2,2,2,2});
  auto network_ttn = makeSharedTensorNetwork("TensorTree",output_tensor_ttn,*builder_ttn);
  network_ttn->printIt();
+
+ //Building a 3x6 peps lattice tensor network
+/*
+	1       2       3       4       5       6
+    X ----- X ----- X ----- X ----- X ----- X
+   /|      /|      /|      /|      /|      /|
+	|	    |	    |	    |	    | 	    |
+	7       8	    9      10      11      12
+	X ----- X ----- X ----- X ----- X ----- X
+   /|      /|      /|      /|      /|      /|
+	|	    |	    |	    |	    | 	    |
+   13       14	    15      16      17      18
+    X ----- X ----- X ----- X ----- X ----- X
+   /       /       /       /       /       /
+
+*/
+ auto success_d = builder_peps->setParameter("max_bond_dim", 3); assert(success_d);
+ auto success_lx = builder_peps->setParameter("Lx", 3); assert(success_lx);
+ auto success_ly = builder_peps->setParameter("Ly", 6); assert(success_ly);
+ auto output_tensor_peps = makeSharedTensor("Z_PEPS", std::vector<DimExtent>(18, 2)); // result is a vector with 18 2s'.
+ auto network_peps = makeSharedTensorNetwork("PEPS", output_tensor_peps, *builder_peps);
+ network_peps->printIt();
 }
 
 

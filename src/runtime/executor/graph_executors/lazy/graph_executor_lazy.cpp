@@ -94,7 +94,7 @@ void LazyGraphExecutor::execute(TensorGraph & dag) {
       if(ready_for_execution){ //node is idle
         ready_for_execution = ready_for_execution && dag.nodeDependenciesResolved(progress.current);
         if(ready_for_execution){ //all node dependencies resolved (or none)
-          auto registered = dag.registerDependencyFreeNode(progress.current);
+          auto registered = dag.registerDependencyFreeNode(progress.current);		
           if(registered && logging_.load() > 1) logfile_ << "DAG node detected with all dependencies resolved: " << progress.current << std::endl;
         }else{ //node still has unresolved dependencies, try prefetching
           if(progress.current < (progress.front + this->getPrefetchDepth())){
@@ -265,7 +265,7 @@ void LazyGraphExecutor::execute(TensorGraph & dag) {
     return;
   };
 
-  if(logging_.load() != 0){
+  if(logging_.load() != 0) {
     logfile_ << "DAG entry list of dependency free nodes:";
     auto free_nodes = dag.getDependencyFreeNodes();
     for(const auto & node: free_nodes) logfile_ << " " << node;
