@@ -7,6 +7,7 @@ Copyright (C) 2018-2021 Dmitry I. Lyakh (Liakh)
 Copyright (C) 2018-2021 Oak Ridge National Laboratory (UT-Battelle) **/
 
 #include "network_builder_peps.hpp"
+#include "network_builder_mps.hpp"
 #include "tensor_network.hpp"
 
 #include <initializer_list>
@@ -55,126 +56,171 @@ bool NetworkBuilderPEPS::setParameter(const std::string & name, long long value)
 
 void NetworkBuilderPEPS::build(TensorNetwork & network, bool tensor_operator)
 {
- std::cout << "SRIDEBUG: build for PEPS is called\n";
- std::cout << "TODO: build PEPS, not MPS\n";
+ std::cout << "Srikar: Build for PEPS is called\n";
  bool appended = true;
  //Inspect the output tensor:
  auto output_tensor = network.getTensor(0);
  auto output_tensor_rank = output_tensor->getRank();
  assert(output_tensor_rank > 0);
  const auto & output_dim_extents = output_tensor->getDimExtents();
- if(tensor_operator){
-  assert(output_tensor_rank % 2 == 0); //tensor operators are assumed to be of even rank here
-  output_tensor_rank /= 2;
-  for(unsigned int i = 0; i < output_tensor_rank; ++i){
-   assert(output_dim_extents[i] == output_dim_extents[output_tensor_rank+i]);
-  }
+ for(int i = 0; i < output_tensor_rank; ++i){
+	std::cout << output_dim_extents[i] << " ";
  }
- if(output_tensor_rank == 1){
-  appended = network.placeTensor(1, //tensor id
-                                 std::make_shared<Tensor>("_T"+std::to_string(1), //tensor name
-                                  std::initializer_list<DimExtent>{output_dim_extents[0]}),
-                                 {TensorLeg{0,0}},
-                                 false,
-                                 false
-                                );
-  assert(appended);
-  auto & tensor = *(network.getTensor(1));
-  tensor.rename(generateTensorName(tensor,"t"));
- }else if(output_tensor_rank == 2){
-  DimExtent bond_dim = std::min(static_cast<DimExtent>(max_bond_dim_),
-                                std::min(output_dim_extents[0],output_dim_extents[1]));
-  appended = network.placeTensor(1, //tensor id
-                                 std::make_shared<Tensor>("_T"+std::to_string(1), //tensor name
-                                  std::initializer_list<DimExtent>{output_dim_extents[0],bond_dim}),
-                                 {TensorLeg{0,0},TensorLeg{2,0}},
-                                 false,
-                                 false
-                                );
-  assert(appended);
-  auto & tensor1 = *(network.getTensor(1));
-  tensor1.rename(generateTensorName(tensor1,"t"));
-  appended = network.placeTensor(2, //tensor id
-                                 std::make_shared<Tensor>("_T"+std::to_string(2), //tensor name
-                                  std::initializer_list<DimExtent>{bond_dim,output_dim_extents[1]}),
-                                 {TensorLeg{1,1},TensorLeg{0,1}},
-                                 false,
-                                 false
-                                );
-  assert(appended);
-  auto & tensor2 = *(network.getTensor(2));
-  tensor2.rename(generateTensorName(tensor2,"t"));
- }else{ //output_tensor_rank > 2
-  //Compute internal bond dimensions:
-  DimExtent left_bonds[output_tensor_rank], right_bonds[output_tensor_rank];
-  DimExtent left_dim = 1;
-  for(int i = 0; i < output_tensor_rank; ++i){
-   left_bonds[i] = left_dim;
-   left_dim *= output_dim_extents[i];
-   if(left_dim > max_bond_dim_) left_dim = max_bond_dim_;
-  }
-  DimExtent right_dim = 1;
-  for(int i = (output_tensor_rank - 1); i >= 0; --i){
-   right_bonds[i] = right_dim;
-   right_dim *= output_dim_extents[i];
-   if(right_dim > max_bond_dim_) right_dim = max_bond_dim_;
-  }
-  //Append left boundary input tensor:
-  right_dim = std::min(left_bonds[1],right_bonds[0]);
-  appended = network.placeTensor(1, //tensor id
-                                 std::make_shared<Tensor>("_T"+std::to_string(1), //tensor name
-                                  std::initializer_list<DimExtent>{output_dim_extents[0],right_dim}),
-                                 {TensorLeg{0,0},TensorLeg{2,0}},
-                                 false,
-                                 false
-                                );
-  assert(appended);
-  auto & tensor1 = *(network.getTensor(1));
-  tensor1.rename(generateTensorName(tensor1,"t"));
-  //Append right boundary input tensor:
-  left_dim = std::min(right_bonds[output_tensor_rank-2],left_bonds[output_tensor_rank-1]);
-  appended = network.placeTensor(output_tensor_rank, //tensor id
-                                 std::make_shared<Tensor>("_T"+std::to_string(output_tensor_rank), //tensor name
-                                  std::initializer_list<DimExtent>{left_dim,output_dim_extents[output_tensor_rank-1]}),
-                                 {TensorLeg{output_tensor_rank-1,2},TensorLeg{0,output_tensor_rank-1}},
-                                 false,
-                                 false
-                                );
-  assert(appended);
-  auto & tensor2 = *(network.getTensor(output_tensor_rank));
-  tensor2.rename(generateTensorName(tensor2,"t"));
-  //Append the internal input tensors:
-  for(unsigned int i = 1; i < (output_tensor_rank - 1); ++i){
-   left_dim = std::min(left_bonds[i],right_bonds[i-1]);
-   right_dim = std::min(right_bonds[i],left_bonds[i+1]);
-   if(i == 1){
-    appended = network.placeTensor(1+i, //tensor id
-                                   std::make_shared<Tensor>("_T"+std::to_string(1+i), //tensor name
-                                    std::initializer_list<DimExtent>{left_dim,output_dim_extents[i],right_dim}),
-                                   {TensorLeg{i,1},TensorLeg{0,i},TensorLeg{i+2,0}},
-                                   false,
-                                   false
-                                  );
-   }else{
-    appended = network.placeTensor(1+i, //tensor id
-                                   std::make_shared<Tensor>("_T"+std::to_string(1+i), //tensor name
-                                    std::initializer_list<DimExtent>{left_dim,output_dim_extents[i],right_dim}),
-                                   {TensorLeg{i,2},TensorLeg{0,i},TensorLeg{i+2,0}},
-                                   false,
-                                   false
-                                  );
-   }
-   assert(appended);
-   auto & tensor = *(network.getTensor(1+i));
-   tensor.rename(generateTensorName(tensor,"t"));
-  }
+ std::cout << "\n";
+ // Layers that will later add up and form PEPS
+ std::cout << "Lx_=" << Lx_ << " Ly_=" << Ly_ << std::endl;
+ std::vector<std::shared_ptr<TensorNetwork> > layers(Lx_);
+ // For Lx layers, first Ly dimensions belong to top layer, last Ly dimensions belong to bottom layer. In between, every MPO has Ly dimensions.
+ std::vector<std::vector<DimExtent> > dims_in_layer;
+ for(DimExtent i=0; i < Lx_; i++) {
+	std::vector<DimExtent> each;
+	for(DimExtent j=0; j < Ly_; j++){
+		each.push_back((DimExtent)4);
+	}
+	dims_in_layer.push_back(each);
  }
- if(tensor_operator){
-  for(unsigned int i = 0; i < output_tensor_rank; ++i){
-   auto * tens_conn = network.getTensorConn(1+i);
-   tens_conn->appendLeg(output_dim_extents[output_tensor_rank+i],TensorLeg{0,output_tensor_rank+i});
-  }
+ auto & network_build_factory = *(numerics::NetworkBuildFactory::get());
+ // top layer MPS
+ auto peps = network_build_factory.createNetworkBuilderShared("MPS");
+ auto success = peps->setParameter("max_bond_dim", max_bond_dim_); assert(success);
+ auto output_tensor_mps_top = makeSharedTensor("Z_MPS", dims_in_layer[0]);
+ auto network_peps = makeSharedTensorNetwork("PEPS",output_tensor_mps_top, *peps);
+ layers[0] = network_peps;
+ // middle layer(s)
+ for(DimExtent i=1; i <= Lx_-2; i++) {
+	auto middle_mpo = network_build_factory.createNetworkBuilderShared("MPS");
+	auto success = middle_mpo->setParameter("max_bond_dim", max_bond_dim_); assert(success);
+	auto output_tensor_middle_mpo = makeSharedTensor("Z_MPS", dims_in_layer[i]);
+	auto network_middle_mpo = makeSharedTensorNetwork("TensorTrain",output_tensor_middle_mpo, *middle_mpo);
+	layers[i] = network_middle_mpo;
  }
+ // bottom layer MPS
+ auto bottom_mps = network_build_factory.createNetworkBuilderShared("MPS");
+ success = bottom_mps->setParameter("max_bond_dim", max_bond_dim_); assert(success);
+ auto output_tensor_mps_bottom = makeSharedTensor("Z_MPS", dims_in_layer[Lx_-1]);
+ auto network_bottom_mps = makeSharedTensorNetwork("TensorTrain",output_tensor_mps_bottom, *bottom_mps);
+ layers[Lx_-1] = network_bottom_mps;
+ // TODO: join layers (1,..) to 0 form PEPS
+ for(int i=1; i < Lx_; i++) {
+	// connect layer i
+	std::cout << "connecting layer " << i << std::endl;
+	layers[i]->printIt();
+	// don't know how to use paring yet. I'm manually doing pairing below later.
+	bool success_append = network_peps->appendTensorNetwork(std::move(*layers[i]), {});
+	assert(success_append);
+ }
+ // for each tensor in PEPS, modify TensorLeg if needed.
+ for (int tensor_id = 1; tensor_id <= Lx_ * Ly_; ++tensor_id) {
+	if (tensor_id == 1) {
+		// Top-left corner
+		std::cout << "TOP-LEFT - " << tensor_id << std::endl;
+		// below and right legs
+		network_peps->getTensor(tensor_id)->printIt();
+		std::cout << "\n" << "adj list - ";
+		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
+		for (auto const& i : l) {
+			std::cout << i << " ";
+		}
+		std::cout << "\n";
+	}
+	else if (tensor_id == Lx_) {
+		// Top-right corner
+		std::cout << "TOP-RIGHT - " << tensor_id << std::endl;
+		// left and below legs
+		network_peps->getTensor(tensor_id)->printIt();
+		std::cout << "\n" << "adj list - ";
+		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
+		for (auto const& i : l) {
+			std::cout << i << " ";
+		}
+		std::cout << "\n";
+	}
+	else if (tensor_id == (Ly_ - 1) * Lx_ + 1) {
+		// Bottom-left corner
+		std::cout << "BOTTOM-LEFT - " << tensor_id << std::endl;
+		// up and right legs
+		network_peps->getTensor(tensor_id)->printIt();
+		std::cout << "\n" << "adj list - ";
+		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
+		for (auto const& i : l) {
+			std::cout << i << " ";
+		}
+		std::cout << "\n";
+	}
+	else if (tensor_id == Lx_ * Ly_) {
+		// Bottom-right corner
+		std::cout << "BOTTOM-RIGHT - " << tensor_id << std::endl;
+		// left and up legs
+		network_peps->getTensor(tensor_id)->printIt();
+		std::cout << "\n" << "adj list - ";
+		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
+		for (auto const& i : l) {
+			std::cout << i << " ";
+		}
+		std::cout << "\n";
+	}
+	else if (tensor_id > 1 && tensor_id < Lx_) {
+		// Top boundary cells
+		std::cout << "TOP - " << tensor_id << std::endl;
+		// left, right, down legs
+		network_peps->getTensor(tensor_id)->printIt();
+		std::cout << "\n" << "adj list - ";
+		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
+		for (auto const& i : l) {
+			std::cout << i << " ";
+		}
+		std::cout << "\n";
+	}
+	else if (tensor_id > (Ly_ - 1) * Lx_ && tensor_id < Lx_ * Ly_) {
+		// Bottom boundary cells
+		std::cout << "BOTTOM - " << tensor_id << std::endl;
+		// left, right and up legs
+		network_peps->getTensor(tensor_id)->printIt();
+		std::cout << "\n" << "adj list - ";
+		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
+		for (auto const& i : l) {
+			std::cout << i << " ";
+		}
+		std::cout << "\n";
+	}
+	else if ((tensor_id - 1) % Lx_ == 0 && tensor_id != 1 && tensor_id != (Ly_ - 1) * Lx_ + 1) {
+		// Left boundary cells
+		std::cout << "LEFT - " << tensor_id << std::endl;
+		// up, down, right legs
+		network_peps->getTensor(tensor_id)->printIt();
+		std::cout << "\n" << "adj list - ";
+		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
+		for (auto const& i : l) {
+			std::cout << i << " ";
+		}
+		std::cout << "\n";
+	}
+	else if (tensor_id % Lx_ == 0 && tensor_id != Lx_ && tensor_id != Lx_ * Ly_) {
+		// Right boundary cells
+		std::cout << "RIGHT - " << tensor_id << std::endl;
+		// up, down, left legs
+		network_peps->getTensor(tensor_id)->printIt();
+		std::cout << "\n" << "adj list - ";
+		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
+		for (auto const& i : l) {
+			std::cout << i << " ";
+		}
+		std::cout << "\n";
+	}
+	else {
+		// Middle cells
+		std::cout << "MIDDLE - " << tensor_id << std::endl;
+		// up, down, left and right legs
+		network_peps->getTensor(tensor_id)->printIt();
+		std::cout << "\n" << "adj list - ";
+		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
+		for (auto const& i : l) {
+			std::cout << i << " ";
+		}
+		std::cout << "\n";
+	}
+ }
+ network = *network_peps;
  return;
 }
 
