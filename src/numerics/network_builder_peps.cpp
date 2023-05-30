@@ -104,123 +104,111 @@ void NetworkBuilderPEPS::build(TensorNetwork & network, bool tensor_operator)
  for(int i=1; i < Lx_; i++) {
 	// connect layer i
 	std::cout << "connecting layer " << i << std::endl;
-	layers[i]->printIt();
-	// don't know how to use paring yet. I'm manually doing pairing below later.
+	// layers[i]->printIt();
+	// don't know how to use paring yet, I'm manually doing pairing below later.
 	bool success_append = network_peps->appendTensorNetwork(std::move(*layers[i]), {});
 	assert(success_append);
  }
+ // This section can be removed once I figure out how pairing works.
  // for each tensor in PEPS, modify TensorLeg if needed.
- for (int tensor_id = 1; tensor_id <= Lx_ * Ly_; ++tensor_id) {
+ std::cout << "adding missing tensor legs " << std::endl;
+ //TODO
+ std::cout << ") indices are not handled yet, need to be careful here" << std::endl;
+ for (unsigned long int tensor_id = 1; tensor_id <= Lx_ * Ly_; ++tensor_id) {
 	if (tensor_id == 1) {
 		// Top-left corner
+		// add tensorLeg below tensor (id = 1 + Ly_)
 		std::cout << "TOP-LEFT - " << tensor_id << std::endl;
-		// below and right legs
 		network_peps->getTensor(tensor_id)->printIt();
-		std::cout << "\n" << "adj list - ";
-		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
-		for (auto const& i : l) {
-			std::cout << i << " ";
+		network_peps->getTensorConn(tensor_id)->appendLeg(3, TensorLeg{tensor_id + Ly_, 0});
+		for(auto const& i: network_peps->getTensorConn(tensor_id)->getTensorLegs()) {
+			i.printIt();
+			std::cout << std::endl;
 		}
-		std::cout << "\n";
 	}
 	else if (tensor_id == Lx_) {
 		// Top-right corner
 		std::cout << "TOP-RIGHT - " << tensor_id << std::endl;
-		// left and below legs
 		network_peps->getTensor(tensor_id)->printIt();
-		std::cout << "\n" << "adj list - ";
-		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
-		for (auto const& i : l) {
-			std::cout << i << " ";
+		network_peps->getTensorConn(tensor_id)->appendLeg(3, TensorLeg{tensor_id + Ly_, 0});
+		for(auto const& i: network_peps->getTensorConn(tensor_id)->getTensorLegs()) {
+			i.printIt();
+			std::cout << std::endl;
 		}
-		std::cout << "\n";
 	}
 	else if (tensor_id == (Ly_ - 1) * Lx_ + 1) {
 		// Bottom-left corner
 		std::cout << "BOTTOM-LEFT - " << tensor_id << std::endl;
 		// up and right legs
 		network_peps->getTensor(tensor_id)->printIt();
-		std::cout << "\n" << "adj list - ";
-		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
-		for (auto const& i : l) {
-			std::cout << i << " ";
+		for(auto const& i: network_peps->getTensorConn(tensor_id)->getTensorLegs()) {
+			i.printIt();
+			std::cout << std::endl;
 		}
-		std::cout << "\n";
 	}
 	else if (tensor_id == Lx_ * Ly_) {
 		// Bottom-right corner
 		std::cout << "BOTTOM-RIGHT - " << tensor_id << std::endl;
 		// left and up legs
 		network_peps->getTensor(tensor_id)->printIt();
-		std::cout << "\n" << "adj list - ";
-		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
-		for (auto const& i : l) {
-			std::cout << i << " ";
+		for(auto const& i: network_peps->getTensorConn(tensor_id)->getTensorLegs()) {
+			i.printIt();
+			std::cout << std::endl;
 		}
-		std::cout << "\n";
 	}
 	else if (tensor_id > 1 && tensor_id < Lx_) {
 		// Top boundary cells
 		std::cout << "TOP - " << tensor_id << std::endl;
-		// left, right, down legs
 		network_peps->getTensor(tensor_id)->printIt();
-		std::cout << "\n" << "adj list - ";
-		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
-		for (auto const& i : l) {
-			std::cout << i << " ";
+		network_peps->getTensorConn(tensor_id)->appendLeg(3, TensorLeg{tensor_id + Ly_, 0});
+		for(auto const& i: network_peps->getTensorConn(tensor_id)->getTensorLegs()) {
+			i.printIt();
+			std::cout << std::endl;
 		}
-		std::cout << "\n";
 	}
 	else if (tensor_id > (Ly_ - 1) * Lx_ && tensor_id < Lx_ * Ly_) {
 		// Bottom boundary cells
 		std::cout << "BOTTOM - " << tensor_id << std::endl;
-		// left, right and up legs
 		network_peps->getTensor(tensor_id)->printIt();
-		std::cout << "\n" << "adj list - ";
-		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
-		for (auto const& i : l) {
-			std::cout << i << " ";
+		for(auto const& i: network_peps->getTensorConn(tensor_id)->getTensorLegs()) {
+			i.printIt();
+			std::cout << std::endl;
 		}
-		std::cout << "\n";
 	}
 	else if ((tensor_id - 1) % Lx_ == 0 && tensor_id != 1 && tensor_id != (Ly_ - 1) * Lx_ + 1) {
 		// Left boundary cells
 		std::cout << "LEFT - " << tensor_id << std::endl;
-		// up, down, right legs
 		network_peps->getTensor(tensor_id)->printIt();
-		std::cout << "\n" << "adj list - ";
-		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
-		for (auto const& i : l) {
-			std::cout << i << " ";
+		network_peps->getTensorConn(tensor_id)->appendLeg(3, TensorLeg{tensor_id + Ly_, 0});
+		for(auto const& i: network_peps->getTensorConn(tensor_id)->getTensorLegs()) {
+			i.printIt();
+			std::cout << std::endl;
 		}
-		std::cout << "\n";
 	}
 	else if (tensor_id % Lx_ == 0 && tensor_id != Lx_ && tensor_id != Lx_ * Ly_) {
 		// Right boundary cells
 		std::cout << "RIGHT - " << tensor_id << std::endl;
-		// up, down, left legs
 		network_peps->getTensor(tensor_id)->printIt();
-		std::cout << "\n" << "adj list - ";
-		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
-		for (auto const& i : l) {
-			std::cout << i << " ";
+		network_peps->getTensorConn(tensor_id)->appendLeg(3, TensorLeg{tensor_id + Ly_, 0});
+		for(auto const& i: network_peps->getTensorConn(tensor_id)->getTensorLegs()) {
+			i.printIt();
+			std::cout << std::endl;
 		}
-		std::cout << "\n";
 	}
 	else {
 		// Middle cells
 		std::cout << "MIDDLE - " << tensor_id << std::endl;
-		// up, down, left and right legs
 		network_peps->getTensor(tensor_id)->printIt();
-		std::cout << "\n" << "adj list - ";
-		std::list<unsigned int> l = network_peps->getAdjacentTensors(tensor_id);
-		for (auto const& i : l) {
-			std::cout << i << " ";
+		network_peps->getTensorConn(tensor_id)->appendLeg(3, TensorLeg{tensor_id + Ly_, 0});
+		for(auto const& i: network_peps->getTensorConn(tensor_id)->getTensorLegs()) {
+			i.printIt();
+			std::cout << std::endl;
 		}
-		std::cout << "\n";
 	}
  }
+ network_peps->finalize();
  network = *network_peps;
+//  network_peps->printTensorNetwork("PEPS");
  return;
 }
 
