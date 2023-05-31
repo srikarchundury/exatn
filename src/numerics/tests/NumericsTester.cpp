@@ -176,12 +176,12 @@ TEST(NumericsTester, checkNetworkBuilders)
    /       /       /       /       /       /
 
 */
- auto success_d = builder_peps->setParameter("max_bond_dim", 3); assert(success_d);
  int lx = 3;
  int ly = 3;
+ auto success_d = builder_peps->setParameter("max_bond_dim", 6); assert(success_d);
  auto success_lx = builder_peps->setParameter("Lx", lx); assert(success_lx);
  auto success_ly = builder_peps->setParameter("Ly", ly); assert(success_ly);
- auto output_tensor_peps = makeSharedTensor("Z_PEPS", std::vector<DimExtent>(lx * ly, 4)); // result is a vector with 6 2s'.
+ auto output_tensor_peps = makeSharedTensor("Z_PEPS", std::vector<DimExtent>(lx * ly, 2));
  auto network_peps = makeSharedTensorNetwork("PEPS", output_tensor_peps, *builder_peps);
  network_peps->printIt();
 }

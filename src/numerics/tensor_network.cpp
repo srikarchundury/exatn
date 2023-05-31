@@ -1345,6 +1345,9 @@ bool TensorNetwork::appendTensorGateGeneral(std::shared_ptr<Tensor> tensor,
  return appendTensorGateGeneral(getMaxTensorId()+1,tensor,pairing,conjugated);
 }
 
+bool TensorNetwork::removeTensorConn(unsigned int tensor_id) {
+	return eraseTensorConn(tensor_id);
+}
 
 bool TensorNetwork::appendTensorNetwork(TensorNetwork && network,                                           //in: appended tensor network
                                         const std::vector<std::pair<unsigned int, unsigned int>> & pairing) //in: leg pairing: output tensor mode (primary) -> output tensor mode (appended)

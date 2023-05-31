@@ -593,6 +593,9 @@ public:
      together with its connections (legs). If not found, returns nullptr. **/
  TensorConn * getTensorConn(unsigned int tensor_id);
 
+ /** TODO: REMOVE THIS LATER, to use pairing in appendTensorNetwork method, Erases a connected tensor from the tensor network. (PUBLIC,) **/
+ bool removeTensorConn(unsigned int tensor_id);
+
 protected:
 
  /** Emplaces a connected tensor into the tensor network. **/
@@ -660,7 +663,6 @@ protected:
      to the same edge in the tensor network. It will also assure the use of real tensor names.
      If the tensor operation list is empty, does nothing. **/
  void establishUniversalIndexNumeration();
-
 
 private:
 
