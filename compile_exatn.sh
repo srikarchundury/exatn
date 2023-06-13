@@ -1,0 +1,1 @@
+rm -rf build && mkdir build && cd build && CC=gcc CXX=g++ FC=gfortran cmake .. -DCMAKE_INSTALL_PREFIX=${EXATN_INSTALL_PATH} -DEXATN_BUILD_TESTS=TRUE -DBLAS_LIB=OPENBLAS -DBLAS_PATH=${OPEN_BLAS_PATH} -DWITH_LAPACK=YES && make install

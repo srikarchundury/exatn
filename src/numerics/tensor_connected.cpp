@@ -97,6 +97,11 @@ void TensorConn::resetTensorId(unsigned int tensor_id)
 
 const TensorLeg & TensorConn::getTensorLeg(unsigned int leg_id) const
 {
+	// std::cout << "tensor_ ID = " << id_ << std::endl;
+	tensor_->printIt();
+	std::cout << std::endl;
+	// std::cout << "asking for leg id = " << leg_id << std::endl;
+	// std::cout << "legs_size() = " << legs_.size() << std::endl;
  assert(leg_id < legs_.size());
  return legs_[leg_id];
 }

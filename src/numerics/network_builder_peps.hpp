@@ -10,6 +10,8 @@ Copyright (C) 2018-2021 Oak Ridge National Laboratory (UT-Battelle) **/
  (a) Builds a projected entangled pair state tensor network:
      Parameters:
      * max_bond_dim: Maximal internal bond dimension;
+	 * Lx: number of rows
+	 * Ly: number of columns
 
  (b) Tensor numeration (tensor network vector): example- 3x6 lattice
 
@@ -42,6 +44,7 @@ Copyright (C) 2018-2021 Oak Ridge National Laboratory (UT-Battelle) **/
          /|      /|      /|      /|      /|      /|
 		  |       |       |       |       |       |
 
+  (d) The legs go 0,1,2,3 around each tensor. So, 0 is left, 1 is top, 2 is right, 3 is bottom.
 **/
 
 #ifndef EXATN_NUMERICS_NETWORK_BUILDER_PEPS_HPP_

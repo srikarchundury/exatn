@@ -591,12 +591,11 @@ public:
 
  /** PROTECTED: Returns a non-owning pointer to a given tensor of the tensor network
      together with its connections (legs). If not found, returns nullptr. **/
- TensorConn * getTensorConn(unsigned int tensor_id);
-
- /** TODO: REMOVE THIS LATER, to use pairing in appendTensorNetwork method, Erases a connected tensor from the tensor network. (PUBLIC,) **/
- bool removeTensorConn(unsigned int tensor_id);
+ TensorConn * getTensorConn(unsigned int tensor_id); 
 
 protected:
+
+	bool removeTensorConn(unsigned int tensor_id);
 
  /** Emplaces a connected tensor into the tensor network. **/
  inline bool emplaceTensorConn(unsigned int tensor_id,
