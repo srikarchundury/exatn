@@ -161,7 +161,7 @@ TEST(NumericsTester, checkNetworkBuilders)
  auto network_ttn = makeSharedTensorNetwork("TensorTree",output_tensor_ttn,*builder_ttn);
  network_ttn->printIt();
 
- //Building a 3x6 peps lattice tensor network
+ // Building a 3x6 peps lattice tensor network
 /*
 	1       2       3       4       5       6
     X ----- X ----- X ----- X ----- X ----- X
