@@ -86,6 +86,8 @@ FunctorInitDat::FunctorInitDat(const TensorShape & full_shape,
                std::is_same<NumericType,std::complex<float>>::value ||
                std::is_same<NumericType,std::complex<double>>::value,
                "#ERROR(exatn::numerics::FunctorInitDat): Invalid numeric data type!");
+// full_shape.printIt();std::cout << std::endl;
+// std::cout << full_shape.getVolume() << " != " << ext_data.size() << std::endl;
  assert(full_shape.getVolume() == ext_data.size());
  for(std::size_t i = 0; i < ext_data.size(); ++i) data_[i] = std::complex<double>(ext_data[i]);
 }

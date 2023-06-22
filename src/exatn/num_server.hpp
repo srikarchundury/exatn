@@ -1285,6 +1285,8 @@ bool NumServer::initTensorDataSync(const std::string & name,
 {
  auto iter = tensors_.find(name);
  if(iter == tensors_.end()) return false;
+ std::cout << "EXATN: initTensorDataSync shape here" << std::endl;
+ iter->second->getShape().printIt(); std::cout << std::endl;
  return transformTensorSync(name,std::shared_ptr<TensorMethod>(
          new numerics::FunctorInitDat(iter->second->getShape(),ext_data)));
 }

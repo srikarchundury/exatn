@@ -2558,6 +2558,7 @@ bool NumServer::transformTensor(const std::string & name, std::shared_ptr<Tensor
 
 bool NumServer::transformTensorSync(const std::string & name, std::shared_ptr<TensorMethod> functor)
 {
+	std::cout << "EXATN: transformTensorSync called " << std::endl;
  auto iter = tensors_.find(name);
  if(iter == tensors_.end()){
   //std::cout << "#ERROR(exatn::NumServer::transformTensorSync): Tensor " << name << " not found!" << std::endl;
