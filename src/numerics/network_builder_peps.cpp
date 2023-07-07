@@ -206,13 +206,13 @@ namespace exatn
 			std::cout << "EXATN: creating dummy tensor to be treated as null" << std::endl;
 			appended = network.placeTensor(Lx_ * Ly_ + 1,												  // tensor id
 										   std::make_shared<Tensor>("_T" + std::to_string(Lx_ * Ly_ + 1), // tensor name
-																	std::initializer_list<DimExtent>{1,1,1,2}),
-										   {TensorLeg{}, TensorLeg{}, TensorLeg{}, TensorLeg{}},
+																	std::initializer_list<DimExtent>{2}),
+										   {TensorLeg{}},
 										   false,
 										   false);
 			assert(appended);
 			auto &tensor = *(network.getTensor(Lx_ * Ly_ + 1));
-			tensor.rename(generateTensorName(tensor, "t"));
+			tensor.rename(generateTensorName(tensor, "dummy"));
 			std::cout << "EXATN: placing tensors in PEPS" << std::endl;
 			for (unsigned int tensor_id = 1; tensor_id <= Lx_ * Ly_; ++tensor_id)
 			{
@@ -224,8 +224,8 @@ namespace exatn
 					// std::cout << std::endl;
 					appended = network.placeTensor(tensor_id,												  // tensor id
 												   std::make_shared<Tensor>("_T" + std::to_string(tensor_id), // tensor name
-																			std::initializer_list<DimExtent>{1, 1, 1, 1, output_dim_extents[tensor_id - 1], 1}),
-												   {TensorLeg{Lx_ * Ly_ + 1, 2}, TensorLeg{Lx_ * Ly_ + 1, 3}, TensorLeg{tensor_id + 1, 0}, TensorLeg{tensor_id + Ly_, 1}, TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 2}},
+																			std::initializer_list<DimExtent>{output_dim_extents[tensor_id - 1], 1, 1, 1, 1, 1}),
+												   {TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{tensor_id + 1, 1}, TensorLeg{tensor_id + Ly_, 2}, TensorLeg{Lx_ * Ly_ + 1, 0}},
 												   false,
 												   false);
 					assert(appended);
@@ -238,8 +238,8 @@ namespace exatn
 					std::cout << "TOP-RIGHT - " << tensor_id << std::endl;
 					appended = network.placeTensor(tensor_id,												  // tensor id
 												   std::make_shared<Tensor>("_T" + std::to_string(tensor_id), // tensor name
-																			std::initializer_list<DimExtent>{1, 1, 1, 1, output_dim_extents[tensor_id - 1], 1}),
-												   {TensorLeg{tensor_id - 1, 2}, TensorLeg{Lx_ * Ly_ + 1, 3}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{tensor_id + Ly_, 1}, TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 2}},
+																			std::initializer_list<DimExtent>{output_dim_extents[tensor_id - 1], 1, 1, 1, 1, 1}),
+												   {TensorLeg{0, tensor_id - 1}, TensorLeg{tensor_id - 1, 3}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{tensor_id + Ly_, 2}, TensorLeg{Lx_ * Ly_ + 1, 0}},
 												   false,
 												   false);
 					assert(appended);
@@ -252,8 +252,8 @@ namespace exatn
 					std::cout << "BOTTOM-LEFT - " << tensor_id << std::endl;
 					appended = network.placeTensor(tensor_id,												  // tensor id
 												   std::make_shared<Tensor>("_T" + std::to_string(tensor_id), // tensor name
-																			std::initializer_list<DimExtent>{1, 1, 1, 1, output_dim_extents[tensor_id - 1], 1}),
-												   {TensorLeg{Lx_ * Ly_ + 1, 2}, TensorLeg{tensor_id - Ly_, 3}, TensorLeg{tensor_id + 1, 0}, TensorLeg{Lx_ * Ly_ + 1, 1}, TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 2}},
+																			std::initializer_list<DimExtent>{output_dim_extents[tensor_id - 1], 1, 1, 1, 1, 1}),
+												   {TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{tensor_id - Ly_, 4}, TensorLeg{tensor_id + 1, 1}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{Lx_ * Ly_ + 1, 0}},
 												   false,
 												   false);
 					assert(appended);
@@ -266,8 +266,8 @@ namespace exatn
 					std::cout << "BOTTOM-RIGHT - " << tensor_id << std::endl;
 					appended = network.placeTensor(tensor_id,												  // tensor id
 												   std::make_shared<Tensor>("_T" + std::to_string(tensor_id), // tensor name
-																			std::initializer_list<DimExtent>{1, 1, 1, 1, output_dim_extents[tensor_id - 1], 1}),
-												   {TensorLeg{tensor_id - 1, 2}, TensorLeg{tensor_id - Ly_, 3}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{Lx_ * Ly_ + 1, 1}, TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 2}},
+																			std::initializer_list<DimExtent>{output_dim_extents[tensor_id - 1], 1, 1, 1, 1, 1}),
+												   {TensorLeg{0, tensor_id - 1}, TensorLeg{tensor_id - 1, 3}, TensorLeg{tensor_id - Ly_, 4}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{Lx_ * Ly_ + 1, 0}},
 												   false,
 												   false);
 					assert(appended);
@@ -280,8 +280,8 @@ namespace exatn
 					std::cout << "TOP - " << tensor_id << std::endl;
 					appended = network.placeTensor(tensor_id,												  // tensor id
 												   std::make_shared<Tensor>("_T" + std::to_string(tensor_id), // tensor name
-																			std::initializer_list<DimExtent>{1, 1, 1, 1, output_dim_extents[tensor_id - 1], 1}),
-												   {TensorLeg{tensor_id - 1, 2}, TensorLeg{Lx_ * Ly_ + 1, 3}, TensorLeg{tensor_id + 1, 0}, TensorLeg{tensor_id + Ly_, 1}, TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 2}},
+																			std::initializer_list<DimExtent>{output_dim_extents[tensor_id - 1], 1, 1, 1, 1, 1}),
+												   {TensorLeg{0, tensor_id - 1}, TensorLeg{tensor_id - 1, 3}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{tensor_id + 1, 1}, TensorLeg{tensor_id + Ly_, 1}, TensorLeg{Lx_ * Ly_ + 1, 0}},
 												   false,
 												   false);
 					assert(appended);
@@ -294,8 +294,8 @@ namespace exatn
 					std::cout << "BOTTOM - " << tensor_id << std::endl;
 					appended = network.placeTensor(tensor_id,												  // tensor id
 												   std::make_shared<Tensor>("_T" + std::to_string(tensor_id), // tensor name
-																			std::initializer_list<DimExtent>{1, 1, 1, 1, output_dim_extents[tensor_id - 1], 1}),
-												   {TensorLeg{tensor_id - 1, 2}, TensorLeg{tensor_id - Ly_, 3}, TensorLeg{tensor_id + 1, 0}, TensorLeg{Lx_ * Ly_ + 1, 1}, TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 2}},
+																			std::initializer_list<DimExtent>{output_dim_extents[tensor_id - 1], 1, 1, 1, 1, 1}),
+												   {TensorLeg{0, tensor_id - 1}, TensorLeg{tensor_id - 1, 3}, TensorLeg{tensor_id - Ly_, 4}, TensorLeg{tensor_id + 1, 1}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{Lx_ * Ly_ + 1, 0}},
 												   false,
 												   false);
 					assert(appended);
@@ -308,8 +308,8 @@ namespace exatn
 					std::cout << "LEFT - " << tensor_id << std::endl;
 					appended = network.placeTensor(tensor_id,												  // tensor id
 												   std::make_shared<Tensor>("_T" + std::to_string(tensor_id), // tensor name
-																			std::initializer_list<DimExtent>{1, 1, 1, 1, output_dim_extents[tensor_id - 1], 1}),
-												   {TensorLeg{Lx_ * Ly_ + 1, 2}, TensorLeg{tensor_id - Ly_, 3}, TensorLeg{tensor_id + Ly_, 0}, TensorLeg{tensor_id + Ly_, 1}, TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 2}},
+																			std::initializer_list<DimExtent>{output_dim_extents[tensor_id - 1], 1, 1, 1, 1, 1}),
+												   {TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{tensor_id - Ly_, 4}, TensorLeg{tensor_id + Ly_, 1}, TensorLeg{tensor_id + Ly_, 2}, TensorLeg{Lx_ * Ly_ + 1, 0}},
 												   false,
 												   false);
 					assert(appended);
@@ -322,8 +322,8 @@ namespace exatn
 					std::cout << "RIGHT - " << tensor_id << std::endl;
 					appended = network.placeTensor(tensor_id,												  // tensor id
 												   std::make_shared<Tensor>("_T" + std::to_string(tensor_id), // tensor name
-																			std::initializer_list<DimExtent>{1, 1, 1, 1, output_dim_extents[tensor_id - 1], 1}),
-												   {TensorLeg{tensor_id - 1, 2}, TensorLeg{tensor_id - Ly_, 3}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{tensor_id + Ly_, 1}, TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 2}},
+																			std::initializer_list<DimExtent>{output_dim_extents[tensor_id - 1], 1, 1, 1, 1, 1}),
+												   {TensorLeg{0, tensor_id - 1}, TensorLeg{tensor_id - 1, 3}, TensorLeg{tensor_id - Ly_, 4}, TensorLeg{Lx_ * Ly_ + 1, 0}, TensorLeg{tensor_id + Ly_, 2}, TensorLeg{Lx_ * Ly_ + 1, 0}},
 												   false,
 												   false);
 					assert(appended);
@@ -336,8 +336,8 @@ namespace exatn
 					std::cout << "MIDDLE - " << tensor_id << std::endl;
 					appended = network.placeTensor(tensor_id,												  // tensor id
 												   std::make_shared<Tensor>("_T" + std::to_string(tensor_id), // tensor name
-																			std::initializer_list<DimExtent>{1, 1, 1, 1, 2, 1}),
-												   {TensorLeg{tensor_id - 1, 2}, TensorLeg{tensor_id - Ly_, 3}, TensorLeg{tensor_id + 1, 0}, TensorLeg{tensor_id + Ly_, 1}, TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 2}},
+																			std::initializer_list<DimExtent>{output_dim_extents[tensor_id - 1], 1, 1, 1, 1, 1}),
+												   {TensorLeg{0, tensor_id - 1}, TensorLeg{tensor_id - 1, 3}, TensorLeg{tensor_id - Ly_, 4}, TensorLeg{tensor_id + 1, 1}, TensorLeg{tensor_id + Ly_, 2}, TensorLeg{Lx_ * Ly_ + 1, 0}},
 												   false,
 												   false);
 					assert(appended);
