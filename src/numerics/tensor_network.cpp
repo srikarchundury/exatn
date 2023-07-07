@@ -926,6 +926,7 @@ bool TensorNetwork::placeTensor(unsigned int tensor_id,                     //in
                                 bool conjugated,                            //in: complex conjugation flag for the appended tensor
                                 bool leg_matching_check)                    //in: tensor leg matching check
 {
+  std::cout << "EXATN: tensor_id = " << tensor_id << std::endl;
  if(explicit_output_ == 0){
   std::cout << "#ERROR(TensorNetwork::placeTensor): Invalid request: " <<
    "Appending a tensor via explicit connections to the tensor network that is missing a full output tensor!" << std::endl;
@@ -949,8 +950,15 @@ bool TensorNetwork::placeTensor(unsigned int tensor_id,                     //in
    if(tensconn != nullptr){ //connected tensor is already in the tensor network
     const auto & tens_legs = tensconn->getTensorLegs();
     const auto & tens_leg = tens_legs[leg.getDimensionId()];
-    if(tens_leg.getTensorId() != tensor_id || tens_leg.getDimensionId() != mode){
-     std::cout << "#ERROR(TensorNetwork::placeTensor): Invalid argument: Connections are invalid: "
+    if(tens_leg.getTensorId() != tensor_id) {
+      std::cout << tens_leg.getTensorId() << " != " <<  tensor_id << std::endl;
+     std::cout << "#ERROR-1(TensorNetwork::placeTensor): Invalid argument: Connections are invalid: "
+               << "Failed input leg: "; leg.printIt(); std::cout << std::endl;
+     return false;
+    }
+    if(tens_leg.getDimensionId() != mode) {
+      std::cout << tens_leg.getDimensionId() << " != " <<  mode << std::endl;
+      std::cout << "#ERROR-2(TensorNetwork::placeTensor): Invalid argument: Connections are invalid: "
                << "Failed input leg: "; leg.printIt(); std::cout << std::endl;
      return false;
     }

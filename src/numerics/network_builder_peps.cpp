@@ -69,6 +69,7 @@ namespace exatn
 		void NetworkBuilderPEPS::build(TensorNetwork &network, bool tensor_operator)
 		{
 			std::cout << "EXATN: Build for PEPS is called\n";
+			// network.printIt();std::cout << std::endl;
 			bool appended = true;
 			// Inspect the output tensor:
 			auto output_tensor = network.getTensor(0);
@@ -336,7 +337,7 @@ namespace exatn
 					appended = network.placeTensor(tensor_id,												  // tensor id
 												   std::make_shared<Tensor>("_T" + std::to_string(tensor_id), // tensor name
 																			std::initializer_list<DimExtent>{1, 1, 1, 1, 2, 1}),
-												   {TensorLeg{tensor_id - 1, 2}, TensorLeg{tensor_id - Ly_, 3}, TensorLeg{tensor_id + 1, 0}, TensorLeg{tensor_id + Ly_, 1}, TensorLeg{Lx_ * Ly_ + 1, 2}, TensorLeg{Lx_ * Ly_ + 1, 2}},
+												   {TensorLeg{tensor_id - 1, 2}, TensorLeg{tensor_id - Ly_, 3}, TensorLeg{tensor_id + 1, 0}, TensorLeg{tensor_id + Ly_, 1}, TensorLeg{0, tensor_id - 1}, TensorLeg{Lx_ * Ly_ + 1, 2}},
 												   false,
 												   false);
 					assert(appended);
