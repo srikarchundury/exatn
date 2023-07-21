@@ -747,6 +747,7 @@ bool NumServer::submit(std::shared_ptr<TensorOperation> operation, std::shared_p
 
 bool NumServer::submit(TensorNetwork & network)
 {
+  // std::cout << "EXATN: submitted tensot network to numerical server "  << std::endl;
  return submit(getDefaultProcessGroup(),network);
 }
 
@@ -1045,6 +1046,7 @@ bool NumServer::submit(const ProcessGroup & process_group,
   }
   ++num_items_executed;
  }
+//  std::cout << "EXATN: num_items_executed = " << num_items_executed << std::endl;
  if(logging_ > 0) logfile_ << "Number of submitted sub-networks = " << num_items_executed << std::endl << std::flush;
  return true;
 }
@@ -2558,7 +2560,7 @@ bool NumServer::transformTensor(const std::string & name, std::shared_ptr<Tensor
 
 bool NumServer::transformTensorSync(const std::string & name, std::shared_ptr<TensorMethod> functor)
 {
-	std::cout << "EXATN: transformTensorSync called " << std::endl;
+	// std::cout << "EXATN: transformTensorSync called " << std::endl;
  auto iter = tensors_.find(name);
  if(iter == tensors_.end()){
   //std::cout << "#ERROR(exatn::NumServer::transformTensorSync): Tensor " << name << " not found!" << std::endl;

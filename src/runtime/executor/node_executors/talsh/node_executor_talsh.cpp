@@ -1426,6 +1426,7 @@ void TalshNodeExecutor::clearCache()
 std::shared_ptr<talsh::Tensor> TalshNodeExecutor::getLocalTensor(const numerics::Tensor & tensor,
                                   const std::vector<std::pair<DimOffset,DimExtent>> & slice_spec)
 {
+  // std::cout << "EXATN: called getLocalTensor " << std::endl;
  const auto tensor_rank = slice_spec.size();
  std::vector<std::size_t> signature(tensor_rank);
  std::vector<int> offsets(tensor_rank);
@@ -1461,6 +1462,7 @@ std::shared_ptr<talsh::Tensor> TalshNodeExecutor::getLocalTensor(const numerics:
    tensor.printIt();
    std::abort();
   }
+  // std::cout << "EXATN: here " << std::endl;
   tens_pos->second.resetTensorShapeToFull();
   auto & talsh_tensor = *(tens_pos->second.talsh_tensor);
   auto error_code = talsh_tensor.extractSlice(nullptr,*slice,offsets);

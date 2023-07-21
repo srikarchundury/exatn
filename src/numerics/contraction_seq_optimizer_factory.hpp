@@ -20,6 +20,9 @@ SPDX-License-Identifier: BSD-3-Clause **/
 #include "contraction_seq_optimizer_heuro.hpp"
 #include "contraction_seq_optimizer_greed.hpp"
 #include "contraction_seq_optimizer_metis.hpp"
+
+#include "contraction_seq_optimizer_peps.hpp"
+
 #ifdef CUQUANTUM
 #include "contraction_seq_optimizer_cutnn.hpp"
 #endif

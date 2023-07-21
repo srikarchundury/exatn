@@ -249,7 +249,11 @@ bool generate_contraction_pattern(const std::vector<numerics::TensorLeg> & patte
 /* pattern[left_rank + right_rank] = {left_legs + right_legs} */
 {
  const std::size_t DEFAULT_STRING_CAPACITY = 256; //string capacity reserve value
-
+//  if(pattern.size() != left_tensor_rank + right_tensor_rank) {
+//     std::cout << "pattern.size() != left_tensor_rank + right_tensor_rank ====== " << pattern.size() << " != " << left_tensor_rank << " + " << right_tensor_rank << std::endl;
+//  } else {
+//     std::cout << "pattern.size() == left_tensor_rank + right_tensor_rank ====== " << pattern.size() << " == " << left_tensor_rank << " + " << right_tensor_rank << std::endl;
+//  }
  assert(pattern.size() == left_tensor_rank + right_tensor_rank);
  symb_pattern.clear();
  if(pattern.empty()){ //multiplication of scalars

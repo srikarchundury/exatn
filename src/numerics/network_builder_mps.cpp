@@ -171,25 +171,25 @@ namespace exatn
 			}
 			if (tensor_operator)
 			{
-				std::cout << "MPS: True for operator" << std::endl;
+				// std::cout << "MPS: True for operator" << std::endl;
 				for (unsigned int i = 0; i < output_tensor_rank; ++i)
 				{
 					auto *tens_conn = network.getTensorConn(1 + i);
 					tens_conn->appendLeg(output_dim_extents[output_tensor_rank + i], TensorLeg{0, output_tensor_rank + i});
 				}
 			}
-			std::cout << "MPS: Running Finalize" << std::endl;
-			std::cout << "MPS: MPS generated is as follows: " << std::endl;
-			for (unsigned long int tensor_id = 0; tensor_id <= output_tensor_rank - 2; tensor_id++)
-			{
-				std::cout << "Tensor ID=" << tensor_id << std::endl;
-				for (auto const &i : network.getTensorConn(tensor_id)->getTensorLegs())
-				{
-					i.printIt();
-					std::cout << std::endl;
-				}
-			}
-			std::cout << "MPS: End of build call" << std::endl;
+			// std::cout << "MPS: Running Finalize" << std::endl;
+			// std::cout << "MPS: MPS generated is as follows: " << std::endl;
+			// for (unsigned long int tensor_id = 0; tensor_id <= output_tensor_rank - 2; tensor_id++)
+			// {
+			// 	std::cout << "Tensor ID=" << tensor_id << std::endl;
+			// 	for (auto const &i : network.getTensorConn(tensor_id)->getTensorLegs())
+			// 	{
+			// 		i.printIt();
+			// 		std::cout << std::endl;
+			// 	}
+			// }
+			// std::cout << "MPS: End of build call" << std::endl;
 			return;
 		}
 

@@ -926,7 +926,7 @@ bool TensorNetwork::placeTensor(unsigned int tensor_id,                     //in
                                 bool conjugated,                            //in: complex conjugation flag for the appended tensor
                                 bool leg_matching_check)                    //in: tensor leg matching check
 {
-  std::cout << "EXATN: tensor_id = " << tensor_id << std::endl;
+  // std::cout << "EXATN: tensor_id = " << tensor_id << std::endl;
  if(explicit_output_ == 0){
   std::cout << "#ERROR(TensorNetwork::placeTensor): Invalid request: " <<
    "Appending a tensor via explicit connections to the tensor network that is missing a full output tensor!" << std::endl;
@@ -1837,7 +1837,7 @@ bool TensorNetwork::mergeTensors(unsigned int left_id, unsigned int right_id, un
  }
  assert(res_mode == num_uncontracted);
  //Generate symbolic contraction pattern if needed:
- if(contr_pattern != nullptr){
+ if(contr_pattern != nullptr) {
   auto generated = generate_contraction_pattern(pattern,left_tensor_rank,right_tensor_rank,
                                                 *contr_pattern,left_tensor_conj,right_tensor_conj);
   assert(generated);
@@ -2716,6 +2716,7 @@ void TensorNetwork::splitIndices(std::size_t max_intermediate_volume)
       const auto & intermediate = *intermediate_p;
       const auto & intermediate_name = intermediate.getName();
       assert(intermediate_name == tens_name); //tensor must enter the symbolic index pattern under the same name
+      // std::cout << "EXATN: indices size = " << indices.size() << " intermediate rank = " << intermediate.getRank() << std::endl;
       assert(indices.size() == intermediate.getRank());
       double intermediate_volume = 1.0;
       for(unsigned int i = 0; i < indices.size(); ++i){

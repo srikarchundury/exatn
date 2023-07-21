@@ -543,6 +543,7 @@ bool MetisGraph::partitionGraph(std::size_t num_parts,     //in: number of parts
      if(partitions_[adjncy_[edge]] != partition) ++num_cross_edges_;
     }
    }
+//    std::cout << "EXATN: num_cross_edges_ = " << num_cross_edges_ << std::endl;
    assert(num_cross_edges_ % 2 == 0);
    num_cross_edges_ /= 2;
    num_parts_ = num_parts;
