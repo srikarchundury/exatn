@@ -203,16 +203,6 @@ namespace exatn
 			// 		bottom_dim = max_bond_dim_;
 			// }
 			// left_dim = 1; top_dim = 1; right_dim = 1; bottom_dim = 1;
-			std::cout << "EXATN: creating dummy tensor to be treated as null" << std::endl;
-			appended = network.placeTensor(Lx_ * Ly_ + 1,												  // tensor id
-										   std::make_shared<Tensor>("_T" + std::to_string(Lx_ * Ly_ + 1), // tensor name
-																	std::initializer_list<DimExtent>{2,1,1,1,1,1}),
-										   {TensorLeg{}, TensorLeg{}, TensorLeg{}, TensorLeg{}, TensorLeg{}, TensorLeg{}},
-										   false,
-										   false);
-			assert(appended);
-			auto &tensor = *(network.getTensor(Lx_ * Ly_ + 1));
-			tensor.rename(generateTensorName(tensor, "dummy"));
 			std::cout << "EXATN: placing tensors in PEPS" << std::endl;
 			if(Lx_ == 1) {
 				for (unsigned int tensor_id = 1; tensor_id <= Lx_ * Ly_; ++tensor_id)
@@ -388,6 +378,16 @@ namespace exatn
 					}
 				}
 			}
+			std::cout << "EXATN: creating dummy tensor to be treated as null" << std::endl;
+			appended = network.placeTensor(Lx_ * Ly_ + 1,												  // tensor id
+										   std::make_shared<Tensor>("_T" + std::to_string(Lx_ * Ly_ + 1), // tensor name
+																	std::initializer_list<DimExtent>{1,1,1,1,1,1}),
+										   {TensorLeg{}, TensorLeg{}, TensorLeg{}, TensorLeg{}, TensorLeg{}, TensorLeg{}},
+										   false,
+										   false);
+			assert(appended);
+			auto &tensor = *(network.getTensor(Lx_ * Ly_ + 1));
+			tensor.rename(generateTensorName(tensor, "dummy"));
 			// std::cout << "EXATN: modifying 0 output tensor: " << std::endl;
 			// 	for (auto const &i : network.getTensorConn(0)->getTensorLegs())
 			// 	{
@@ -410,16 +410,17 @@ namespace exatn
 			network.finalize();
 			// network = *network_peps;
 			std::cout << "EXATN: PEPS generated is as follows: " << std::endl;
-			for (unsigned long int tensor_id = 0; tensor_id <= Lx_ * Ly_ + 1; tensor_id++)
-			{
-				std::cout << "Tensor ID=" << tensor_id << std::endl;
-				network.getTensor(tensor_id)->printIt(); std::cout << std::endl;
-				for (auto const &i : network.getTensorConn(tensor_id)->getTensorLegs())
-				{
-					i.printIt();
-					std::cout << std::endl;
-				}
-			}
+			// for (unsigned long int tensor_id = 0; tensor_id <= Lx_ * Ly_ + 1; tensor_id++)
+			// {
+			// 	std::cout << "Tensor ID=" << tensor_id << std::endl;
+			// 	network.getTensor(tensor_id)->printIt(); std::cout << std::endl;
+			// 	for (auto const &i : network.getTensorConn(tensor_id)->getTensorLegs())
+			// 	{
+			// 		i.printIt();
+			// 		std::cout << std::endl;
+			// 	}
+			// }
+			network.printIt();std::cout << std::endl;
 			std::cout << "EXATN: End of build call" << std::endl;
 			return;
 		}
