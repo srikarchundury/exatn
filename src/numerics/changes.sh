@@ -6,6 +6,6 @@ cd ../../../../exatn/build/src/numerics/
 
 make install
 
-cd /home/schundu3/projects/ornl_tools/ORNL_QIS_Stack/exatn/build/src/numerics/tests
+# cd /home/schundu3/projects/ornl_tools/ORNL_QIS_Stack/exatn/build/src/numerics/tests
 
-./NumericsTester
+# ./NumericsTester
