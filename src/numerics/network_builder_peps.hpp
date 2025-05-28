@@ -1,50 +1,53 @@
 /** ExaTN::Numerics: Tensor network builder: PEPS: Projected Entangled Pair States
  * 
  * Srikar: Just copied from MPS and replaced all MPS with PEPS to avoid conflicts.
-REVISION: 2023/05/23
-
-Copyright (C) 2018-2021 Dmitry I. Lyakh (Liakh)
-Copyright (C) 2018-2021 Oak Ridge National Laboratory (UT-Battelle) **/
+ * REVISION: 2025/05/28
+ * 
+ * Copyright (C) 2018-2021 Dmitry I. Lyakh (Liakh)
+ * Copyright (C) 2018-2021 Oak Ridge National Laboratory (UT-Battelle) **/
 
 /** Rationale:
  (a) Builds a projected entangled pair state tensor network:
      Parameters:
      * max_bond_dim: Maximal internal bond dimension;
-	 * Lx: number of rows
-	 * Ly: number of columns
+     * Lx: number of rows
+     * Ly: number of columns
 
- (b) Tensor numeration (tensor network vector): example- 3x6 lattice
+ (b) Tensor numeration (row-major format): Example — 3×6 lattice
 
-	1       2       3       4       5       6
-    X ----- X ----- X ----- X ----- X ----- X
-   /|      /|      /|      /|      /|      /|
-	|	    |	    |	    |	    | 	    |
-	12       11	    10      9      8      7
-	X ----- X ----- X ----- X ----- X ----- X
-   /|      /|      /|      /|      /|      /|
-	|	    |	    |	    |	    | 	    |
-   13       14	    15      16      17      18
-    X ----- X ----- X ----- X ----- X ----- X
-   /       /       /       /       /       /
- 
- (c) Projected Entanlged Pair Operator (PEPO) will just have additional open legs at the boundaries, like so-
+    0 -----  1 -----  2 -----  3 -----  4 -----  5
+   /|       /|       /|       /|       /|       /|
+    |        |        |        |        |        |
+   6 -----  7 -----  8 -----  9 ----- 10 ----- 11
+   /|       /|       /|       /|       /|       /|
+    |        |        |        |        |        |
+  12 ----- 13 ----- 14 ----- 15 ----- 16 ----- 17
+   /        /        /        /        /        /
 
-          |       |       |       |       |       |
-          |       |       |       |       |       |
-	      1       2       3       4       5       6
-    ----- X ----- X ----- X ----- X ----- X ----- X -----
-         /|      /|      /|      /|      /|      /|
-	      |	      |	      |	      |	      | 	  |
-	      7       8	      9      10      11      12
-	----- X ----- X ----- X ----- X ----- X ----- X -----
-         /|      /|      /|      /|      /|      /|
-	      |	      |	      |	      |	      | 	  |
-         13       14	  15      16      17      18
-    ----- X ----- X ----- X ----- X ----- X ----- X -----
-         /|      /|      /|      /|      /|      /|
-		  |       |       |       |       |       |
+ (c) Projected Entangled Pair Operator (PEPO) with 6 legs per tensor:
+     * Legs: left (0), top (1), right (2), bottom (3), ket (4), bra (5)
 
-  (d) The legs go 0,1,2,3 around each tensor. So, 0 is left, 1 is top, 2 is right, 3 is bottom.
+           |4       |4       |4       |4       |4       |4
+           |        |        |        |        |        |
+         --X--------X--------X--------X--------X--------X--
+        /| |\     /| |\     /| |\     /| |\     /| |\     /| |\
+      0 | | 2   0 | | 2   0 | | 2   0 | | 2   0 | | 2   0 | | 2
+        \| |/     \| |/     \| |/     \| |/     \| |/     \| |/
+         --X--------X--------X--------X--------X--------X--
+        /| |\     /| |\     /| |\     /| |\     /| |\     /| |\
+      0 | | 2   0 | | 2   0 | | 2   0 | | 2   0 | | 2   0 | | 2
+        \| |/     \| |/     \| |/     \| |/     \| |/     \| |/
+         --X--------X--------X--------X--------X--------X--
+           |        |        |        |        |        |
+           |5       |5       |5       |5       |5       |5
+
+ (d) Tensor leg indexing (around each tensor):
+     * 0 — left
+     * 1 — top
+     * 2 — right
+     * 3 — bottom
+     * 4 — physical ket leg
+     * 5 — physical bra leg
 **/
 
 #ifndef EXATN_NUMERICS_NETWORK_BUILDER_PEPS_HPP_
