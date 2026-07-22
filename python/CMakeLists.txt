@@ -3,7 +3,9 @@ include_directories(${CMAKE_SOURCE_DIR}/src/driver-rpc)
 include_directories(${CMAKE_SOURCE_DIR}/src/numerics)
 include_directories(${Python_INCLUDE_DIRS})
 
-include_directories(${CMAKE_SOURCE_DIR}/tpls/pybind11/include)
+execute_process(COMMAND ${Python_EXECUTABLE} -c "import pybind11; print(pybind11.get_include())"
+                 OUTPUT_VARIABLE PYBIND11_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+include_directories(${PYBIND11_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/tpls/ExaTensor/TALSH)
 include_directories(${CMAKE_SOURCE_DIR}/tpls/eigen)
 
