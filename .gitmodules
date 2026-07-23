@@ -3,7 +3,7 @@
 	url = https://github.com/abseil/googletest
 [submodule "tpls/cppmicroservices"]
 	path = tpls/cppmicroservices
-	url = https://github.com/ornl-qci/cppmicroservices
+	url = git@github.com:srikarchundury/CppMicroServices.git
 [submodule "tpls/pybind11"]
 	path = tpls/pybind11
 	url = https://github.com/pybind/pybind11
